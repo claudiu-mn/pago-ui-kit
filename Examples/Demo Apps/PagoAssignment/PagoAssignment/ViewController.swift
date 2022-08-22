@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import PagoUIKit
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        debugPrint(PagoUIKit().text)
     }
 
 
