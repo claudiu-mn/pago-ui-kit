@@ -7,8 +7,13 @@
 
 import UIKit
 
+@objc public protocol ImprovedTextViewDelegate {
+    @objc optional func improvedTextViewDidChange(_ textView: ImprovedTextView)
+    @objc optional func improvedTextViewDidEndEditing(_ textView: ImprovedTextView)
+}
+
 public class ImprovedTextView : UIView {
-    public var placeholder: String?
+    public weak var delegate: ImprovedTextViewDelegate?
     
     public var validationErrorText: String? {
         didSet { updateValidation() }
@@ -32,17 +37,31 @@ public class ImprovedTextView : UIView {
         get { return textView.layer.cornerRadius }
     }
     
-    public var mainFont: UIFont? {
+    public var font: UIFont? {
         set { textView.font = newValue }
         get { return textView.font }
     }
     
-    public var mainTextColor: UIColor? {
+    public var placeholder: String? {
+        didSet { textView.placeholder = placeholder ?? "" }
+    }
+    
+    public var placeholderColor: UIColor? {
+        get { return textView.placeholderColor }
+        set { textView.placeholderColor = newValue }
+    }
+    
+    public var text: String {
+        get { return textView.text }
+        set { textView.text = newValue }
+    }
+    
+    public var textColor: UIColor? {
         set { textView.textColor = newValue }
         get { return textView.textColor }
     }
     
-    private weak var textView: UITextView!
+    private weak var textView: ExplanatoryTextView!
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -55,27 +74,24 @@ public class ImprovedTextView : UIView {
     }
     
     private func commonInit() {
-        let textView = UITextView()
+        let textView = ExplanatoryTextView()
         
         textView.delegate = self
         
         textView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(textView)
         
-        textView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        textView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        textView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        textView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        textView.fill(self)
         
         textView.textContainerInset = UIEdgeInsets(top: 20,
-                                                   left: 20,
+                                                   left: 17,
                                                    bottom: 20,
-                                                   right: 20)
+                                                   right: 17)
         
         self.textView = textView
         
-        mainFont = UIFont.systemFont(ofSize: 17)
-        mainTextColor = UIColor.darkText
+        font = UIFont.systemFont(ofSize: 17)
+        textColor = UIColor.darkText
         cornerRadius = 10
         borderWidth = 2
         updateValidation()
@@ -90,6 +106,12 @@ public class ImprovedTextView : UIView {
     }
 }
 
-extension ImprovedTextView : UITextViewDelegate {
+extension ImprovedTextView : ExplanatoryTextViewDelegate {
+    func explanatoryTextViewDidChange(_ textView: ExplanatoryTextView) {
+        delegate?.improvedTextViewDidChange?(self)
+    }
     
+    func explanatoryTextViewDidEndEditing(_ textView: ExplanatoryTextView) {
+        delegate?.improvedTextViewDidEndEditing?(self)
+    }
 }

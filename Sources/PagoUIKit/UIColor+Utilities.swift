@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  UIColor+Utilities.swift
 //  
 //
 //  Created by Claudiu Miron on 22.08.2022.
