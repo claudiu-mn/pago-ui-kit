@@ -10,6 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     private weak var stackView: UIStackView!
+    private weak var textView: ValidatingTextView!
     
     private weak var bottomConstraint: NSLayoutConstraint!
     
@@ -33,47 +34,43 @@ class ViewController: UIViewController {
         bottomConstraint.isActive = true
         self.stackView = stackView
         
-        let textView = DetailedTextView()
+        let textView = ValidatingTextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(textView)
         
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Submit", for: UIControl.State.normal)
-        button.backgroundColor = UIColor(rgb: 0xEFF2F7)
-        button.layer.cornerRadius = 10
-        stackView.addArrangedSubview(button)
+        textView.text = "Why so blue, crew?"
+        textView.textColor = UIColor.systemBlue
         
+        textView.placeholder = "Write something in this blue text view…"
+        textView.placeholderColor = UIColor.systemCyan
         
-        textView.font = UIFont.systemFont(ofSize: 17,
-                                          weight: UIFont.Weight.heavy)
-        textView.placeholder = "Write something…"
-        textView.placeholderColor = UIColor.systemPink
-        textView.text = "An ugly looking text view."
-        textView.textColor = UIColor.blue
+        textView.characterCountPrefix = "You have "
+        textView.characterCountLimitHint = 20
+        textView.characterCountSuffix = " characters."
         
-        textView.borderColor = UIColor.green
-        textView.borderWidth = 5
-        textView.cornerRadius = 30
+        textView.primaryFont = UIFont.systemFont(ofSize: 25)
+        textView.secondaryFont = UIFont.systemFont(ofSize: 15)
         
-        textView.primaryFooterText = "Primary footer here"
-        textView.primaryFooterFont = UIFont.systemFont(ofSize: 11,
-                                                       weight: UIFont.Weight.heavy)
-        textView.primaryFooterTextColor = UIColor.orange
-        
-        textView.secondaryFooterText = """
-            A multiline secondary footer here to see
-            if everything is alright UI-wise
-        """
-        textView.secondaryFooterFont = UIFont.systemFont(ofSize: 11,
-                                                         weight: UIFont.Weight.heavy)
-        textView.secondaryFooterTextColor = UIColor.gray
+        textView.setDynamicColor(UIColor.systemOrange, for: .invalid)
+        textView.setDynamicColor(UIColor.systemTeal, for: .valid)
+        textView.characterCountColor = UIColor.systemMint
         
         textView.delegate = self
         
+        self.textView = textView
+        
+        let button = UIButton(type: UIButton.ButtonType.system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Toggle error state", for: UIControl.State.normal)
+        button.backgroundColor = UIColor(rgb: 0xEFF2F7)
+        button.layer.cornerRadius = 10
+        button.addTarget(self,
+                         action: #selector(onButtonTap(sender:)),
+                         for: .touchUpInside)
+        stackView.addArrangedSubview(button)
+        
         let tap = UITapGestureRecognizer(target: self,
                                          action: #selector(ViewController.dismissKeyboard))
-        tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
     }
     
@@ -95,6 +92,14 @@ class ViewController: UIViewController {
         super.viewDidDisappear(animated)
         
         NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func onButtonTap(sender: UIButton) {
+        if textView.errorText != nil {
+            textView.errorText = nil
+        } else {
+            textView.errorText = "Some generic error to test things out!"
+        }
     }
     
     @objc func dismissKeyboard() {
@@ -167,12 +172,12 @@ class ViewController: UIViewController {
     }
 }
 
-extension UIViewController: DetailedTextViewDelegate {
-    public func detailedTextViewDidEndEditing(_ textView: DetailedTextView) {
+extension UIViewController: ValidatingTextViewDelegate {
+    public func validatingTextViewDidEndEditing(_ textView: ValidatingTextView) {
         debugPrint("Editing stopped and text view reads: \(textView.text)")
     }
     
-    public func detailedTextViewDidChange(_ textView: DetailedTextView) {
+    public func validatingTextViewDidChange(_ textView: ValidatingTextView) {
         debugPrint("Text view did change to: \(textView.text)")
     }
 }

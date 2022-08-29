@@ -7,13 +7,13 @@
 
 import UIKit
 
-@objc public protocol DetailedTextViewDelegate {
+@objc protocol DetailedTextViewDelegate {
     @objc optional func detailedTextViewDidChange(_ textView: DetailedTextView)
     @objc optional func detailedTextViewDidEndEditing(_ textView: DetailedTextView)
 }
 
 /// A text view with a maximum of two footers (UILabels) underneath.
-public class DetailedTextView : UIView {
+class DetailedTextView : UIView {
     public weak var delegate: DetailedTextViewDelegate?
     
     // MARK: - Border
@@ -141,19 +141,22 @@ public class DetailedTextView : UIView {
         textView.layer.masksToBounds = true
         self.textView = textView
         
-        font = UIFont.systemFont(ofSize: 17)
+        font = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.body)
         textColor = UIColor.darkText
         cornerRadius = 10
         borderWidth = 2
+        borderColor = UIColor.lightGray
 
         // TODO: Check RTL writing direction and implement if necessary
+        let font = UIFont.preferredFont(forTextStyle: UIFont.TextStyle.footnote)
+        
         primaryFooter = addFooterLabel(to: stackView)
-        primaryFooterFont = UIFont.systemFont(ofSize: 11)
-        primaryFooterTextColor = UIColor.lightGray
+        primaryFooterFont = font
+        primaryFooterTextColor = UIColor.gray
 
         secondaryFooter = addFooterLabel(to: stackView)
-        secondaryFooterFont = UIFont.systemFont(ofSize: 11)
-        secondaryFooterTextColor = UIColor.gray
+        secondaryFooterFont = font
+        secondaryFooterTextColor = UIColor.lightGray
     }
     
     private func addFooterLabel(to stackView: UIStackView) -> UILabel {

@@ -14,10 +14,12 @@ import UIKit
 
 /// A text view that can display a placeholder.
 class ExplanatoryTextView: UIView {
+    public weak var delegate: ExplanatoryTextViewDelegate?
+    
     private weak var textView: UITextView!
     private weak var placeholderView: UITextView!
     
-    public weak var delegate: ExplanatoryTextViewDelegate?
+    // MARK: - Placeholder
     
     public var placeholder: String = "" {
         didSet {
@@ -30,6 +32,12 @@ class ExplanatoryTextView: UIView {
         get { return placeholderView.textColor }
         set { placeholderView.textColor = newValue }
     }
+    
+    private func updatePlaceholderVisibility() {
+        placeholderView.alpha = textView.text.isEmpty ? 1 : 0
+    }
+    
+    // MARK: - Text
     
     public var text: String {
         get { return textView.text }
@@ -59,6 +67,8 @@ class ExplanatoryTextView: UIView {
             placeholderView.textContainerInset = newValue
         }
     }
+    
+    // MARK: - Initialization
     
     override public init(frame: CGRect) {
         super.init(frame: frame)
@@ -98,10 +108,6 @@ class ExplanatoryTextView: UIView {
         placeholderView.textColor = UIColor.gray
         placeholderView.backgroundColor = UIColor.clear
         self.placeholderView = placeholderView
-    }
-    
-    private func updatePlaceholderVisibility() {
-        placeholderView.alpha = textView.text.isEmpty ? 1 : 0
     }
 }
 
