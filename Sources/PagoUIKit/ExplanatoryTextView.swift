@@ -76,7 +76,11 @@ class ExplanatoryTextView: UIView {
         textView.delegate = self
         textView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(textView)
-        textView.fill(self)
+        textView.stick(toTop: 0,
+                       toLeading: 0,
+                       toBottom: 0,
+                       toTrailing: 0,
+                       of: self)
         self.textView = textView
         
         // TODO: No scrolling for placeholder. What if it has really long text?
@@ -86,7 +90,11 @@ class ExplanatoryTextView: UIView {
         placeholderView.isUserInteractionEnabled = false
         placeholderView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(placeholderView)
-        placeholderView.fill(self)
+        placeholderView.stick(toTop: 0,
+                              toLeading: 0,
+                              toBottom: 0,
+                              toTrailing: 0,
+                              of: self)
         placeholderView.textColor = UIColor.gray
         placeholderView.backgroundColor = UIColor.clear
         self.placeholderView = placeholderView

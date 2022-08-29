@@ -9,7 +9,7 @@ import UIKit
 
 // A little bit from https://stackoverflow.com/a/24263296 and
 // a little bit from https://cocoacasts.com/from-hex-to-uicolor-and-back-in-swift
-extension UIColor {
+public extension UIColor {
     convenience init(red: UInt8, green: UInt8, blue: UInt8) {
         self.init(red: red, green: green, blue: blue, alpha: UInt8.max)
     }

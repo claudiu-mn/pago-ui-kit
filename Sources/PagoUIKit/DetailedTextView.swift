@@ -124,7 +124,11 @@ public class DetailedTextView : UIView {
         stackView.axis = NSLayoutConstraint.Axis.vertical
         stackView.spacing = 5
         addSubview(stackView)
-        stackView.fill(self)
+        stackView.stick(toTop: 0,
+                        toLeading: 0,
+                        toBottom: 0,
+                        toTrailing: 0,
+                        of: self)
         
         let textView = ExplanatoryTextView()
         textView.delegate = self
@@ -134,6 +138,7 @@ public class DetailedTextView : UIView {
                                                    left: 17,
                                                    bottom: 20,
                                                    right: 17)
+        textView.layer.masksToBounds = true
         self.textView = textView
         
         font = UIFont.systemFont(ofSize: 17)

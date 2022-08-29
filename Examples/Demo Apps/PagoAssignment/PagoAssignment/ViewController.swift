@@ -9,21 +9,41 @@ import PagoUIKit
 import UIKit
 
 class ViewController: UIViewController {
+    private weak var stackView: UIStackView!
     
-    private let textView = DetailedTextView()
-
+    private weak var bottomConstraint: NSLayoutConstraint!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let spacing: CGFloat = 40
+        
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = NSLayoutConstraint.Axis.vertical
+        stackView.spacing = spacing
+        view.addSubview(stackView)
+        stackView.stick(safely: true,
+                        toTop: spacing,
+                        toLeading: spacing,
+                        toTrailing: -spacing,
+                        of: view)
+        bottomConstraint = stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                                                             constant: -spacing)
+        bottomConstraint.isActive = true
+        self.stackView = stackView
+        
+        let textView = DetailedTextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(textView)
-        textView.leadingAnchor.constraint(equalTo: view.leadingAnchor,
-                                           constant: 20).isActive = true
-        textView.trailingAnchor.constraint(equalTo: view.trailingAnchor,
-                                            constant: -20).isActive = true
-        textView.centerYAnchor.constraint(equalTo: view.centerYAnchor,
-                                           constant: 0).isActive = true
-        textView.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        stackView.addArrangedSubview(textView)
+        
+        let button = UIButton(type: UIButton.ButtonType.system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("Submit", for: UIControl.State.normal)
+        button.backgroundColor = UIColor(rgb: 0xEFF2F7)
+        button.layer.cornerRadius = 10
+        stackView.addArrangedSubview(button)
+        
         
         textView.font = UIFont.systemFont(ofSize: 17,
                                           weight: UIFont.Weight.heavy)
@@ -57,8 +77,93 @@ class ViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self,
+                                       selector: #selector(keyboardWillShow),
+                                       name: UIResponder.keyboardWillShowNotification,
+                                       object: nil)
+        notificationCenter.addObserver(self,
+                                       selector: #selector(keyboardWillHide),
+                                       name: UIResponder.keyboardWillHideNotification,
+                                       object: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     @objc func dismissKeyboard() {
         view.endEditing(true)
+    }
+    
+    
+    // Shamelessly stolen from https://gist.github.com/nekonora/21fd87b1d4192b5d102200199206baee
+    @objc func keyboardWillShow(notification: NSNotification) {
+        let keyboardAnimationDetail = notification.userInfo
+        
+        let animationCurve: Int = {
+            if let keyboardAnimationCurve = keyboardAnimationDetail?[UIResponder.keyboardAnimationCurveUserInfoKey] as? Int {
+                let curve: Int? = UIView.AnimationCurve(rawValue: keyboardAnimationCurve)?.rawValue
+                return curve ?? 0
+            } else {
+                return 0
+            }
+        }()
+        
+        let duration: Double = {
+            if let animationDuration = keyboardAnimationDetail?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Int {
+                return Double(animationDuration)
+            } else {
+                return 0
+            }
+        }()
+        
+        let options = UIView.AnimationOptions(rawValue: ((UInt(animationCurve << 16))))
+        
+        var keyboardHeight = CGFloat(0.0)
+        
+        if let keyboardFrame: NSValue = keyboardAnimationDetail?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue {
+            let keyboardRectangle = keyboardFrame.cgRectValue
+            keyboardHeight = keyboardRectangle.height
+        }
+        
+        UIView.animate(withDuration: duration, delay: 0, options: options) {
+            self.bottomConstraint.constant = -keyboardHeight
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        let keyboardAnimationDetail = notification.userInfo
+        
+        let animationCurve: Int = {
+            if let keyboardAnimationCurve = keyboardAnimationDetail?[UIResponder.keyboardAnimationCurveUserInfoKey] as? Int {
+                let curve: Int? = UIView.AnimationCurve(rawValue: keyboardAnimationCurve)?.rawValue
+                return curve ?? 0
+            } else {
+                return 0
+            }
+        }()
+        
+        let duration: Double = {
+            if let animationDuration = keyboardAnimationDetail?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Int {
+                return Double(animationDuration)
+            } else {
+                return 0
+            }
+        }()
+        
+        let options = UIView.AnimationOptions(rawValue: ((UInt(animationCurve << 16))))
+        
+        UIView.animate(withDuration: duration, delay: 0, options: options) {
+            self.bottomConstraint.constant = 0
+            self.view.layoutIfNeeded()
+        }
     }
 }
 
