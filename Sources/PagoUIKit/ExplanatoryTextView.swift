@@ -12,6 +12,7 @@ import UIKit
     @objc optional func explanatoryTextViewDidEndEditing(_ textView: ExplanatoryTextView)
 }
 
+/// A text view that can display a placeholder.
 class ExplanatoryTextView: UIView {
     private weak var textView: UITextView!
     private weak var placeholderView: UITextView!
@@ -69,6 +70,7 @@ class ExplanatoryTextView: UIView {
         commonInit()
     }
     
+    // TODO: Check RTL writing direction and implement if necessary
     private func commonInit() {
         let textView = UITextView()
         textView.delegate = self

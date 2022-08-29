@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    private let textView = ImprovedTextView()
+    private let textView = DetailedTextView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +36,19 @@ class ViewController: UIViewController {
         textView.borderWidth = 5
         textView.cornerRadius = 30
         
+        textView.primaryFooterText = "Primary footer here"
+        textView.primaryFooterFont = UIFont.systemFont(ofSize: 11,
+                                                       weight: UIFont.Weight.heavy)
+        textView.primaryFooterTextColor = UIColor.orange
+        
+        textView.secondaryFooterText = """
+            A multiline secondary footer here to see
+            if everything is alright UI-wise
+        """
+        textView.secondaryFooterFont = UIFont.systemFont(ofSize: 11,
+                                                         weight: UIFont.Weight.heavy)
+        textView.secondaryFooterTextColor = UIColor.gray
+        
         textView.delegate = self
         
         let tap = UITapGestureRecognizer(target: self,
@@ -49,12 +62,12 @@ class ViewController: UIViewController {
     }
 }
 
-extension UIViewController: ImprovedTextViewDelegate {
-    public func improvedTextViewDidEndEditing(_ textView: ImprovedTextView) {
+extension UIViewController: DetailedTextViewDelegate {
+    public func detailedTextViewDidEndEditing(_ textView: DetailedTextView) {
         debugPrint("Editing stopped and text view reads: \(textView.text)")
     }
     
-    public func improvedTextViewDidChange(_ textView: ImprovedTextView) {
+    public func detailedTextViewDidChange(_ textView: DetailedTextView) {
         debugPrint("Text view did change to: \(textView.text)")
     }
 }
