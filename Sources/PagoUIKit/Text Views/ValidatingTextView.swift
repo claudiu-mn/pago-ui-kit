@@ -31,11 +31,11 @@ public class ValidatingTextView: UIView {
         textView.delegate = self
         textView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(textView)
-        textView.stick(toTop: 0,
-                       toLeading: 0,
-                       toBottom: 0,
-                       toTrailing: 0,
-                       of: self)
+        textView.stick(to: self,
+                       atTop: 0,
+                       atLeading: 0,
+                       atBottom: 0,
+                       atTrailing: 0)
         self.textView = textView
         
         placeholder = "Input text here…"

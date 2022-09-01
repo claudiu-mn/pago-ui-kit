@@ -10,7 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
     private weak var stackView: UIStackView!
-    private weak var textView: ValidatingTextView!
+    
+    private weak var textView: PagoTextView!
     
     private weak var bottomConstraint: NSLayoutConstraint!
     
@@ -24,49 +25,56 @@ class ViewController: UIViewController {
         stackView.axis = NSLayoutConstraint.Axis.vertical
         stackView.spacing = spacing
         view.addSubview(stackView)
-        stackView.stick(safely: true,
-                        toTop: spacing,
-                        toLeading: spacing,
-                        toTrailing: -spacing,
-                        of: view)
+        stackView.stick(to: view,
+                        safely: true,
+                        atTop: spacing,
+                        atLeading: spacing,
+                        atTrailing: -spacing)
         bottomConstraint = stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
                                                              constant: -spacing)
         bottomConstraint.isActive = true
         self.stackView = stackView
         
-        let textView = ValidatingTextView()
+        let textView = PagoTextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(textView)
-
-        textView.text = "Why so blue, crew?"
-        textView.textColor = UIColor.systemBlue
-
-        textView.placeholder = "Write something in this blue text view…"
-        textView.placeholderColor = UIColor.systemCyan
-
-        textView.characterCountPrefix = "You have "
-        textView.characterCountLimitHint = 20
-        textView.characterCountSuffix = " characters."
-
-        textView.primaryFont = UIFont.systemFont(ofSize: 25)
-        textView.secondaryFont = UIFont.systemFont(ofSize: 15)
-
-        textView.setDynamicColor(UIColor.systemOrange, for: .invalid)
-        textView.setDynamicColor(UIColor.systemTeal, for: .valid)
-        textView.characterCountColor = UIColor.systemMint
-        
         textView.delegate = self
-        
         self.textView = textView
+        
+        let characterCountLimit: UInt = 37
+        
+        // TODO: Awkward textView.textView syntax
+        textView.textView.font = UIFont.systemFont(ofSize: 25)
+        
+//        textView.textView.text = "Delete this to reveal the placeholder"
+        textView.textView.textColor = UIColor.systemBlue
+        
+        textView.textView.placeholder = """
+        1. Write 'error' (case-insensitive) to trigger an invalid state
+            
+        2. Write more than \(characterCountLimit) chars
+
+        3. Hire me…
+        """
+        textView.textView.placeholderColor = UIColor.systemCyan
+        
+        textView.textViewBorderWidth = 2
+        textView.textViewCornerRadius = 20
+        textView.setTextViewBorderColor(UIColor.systemTeal, for: .valid)
+        textView.setTextViewBorderColor(UIColor.systemOrange, for: .invalid)
+
+        textView.errorFont = UIFont.systemFont(ofSize: 15)
+        textView.errorTextColor = UIColor.systemOrange
+        
+        textView.characterCountFont = UIFont.systemFont(ofSize: 15)
+        textView.characterCountColor = UIColor.systemMint
+        textView.characterCountLimit = characterCountLimit
         
         let button = UIButton(type: UIButton.ButtonType.system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Toggle error state", for: UIControl.State.normal)
+        button.setTitle("Useless button", for: UIControl.State.normal)
         button.backgroundColor = UIColor(rgb: 0xEFF2F7)
         button.layer.cornerRadius = 10
-        button.addTarget(self,
-                         action: #selector(onButtonTap(sender:)),
-                         for: .touchUpInside)
         stackView.addArrangedSubview(button)
         
         let tap = UITapGestureRecognizer(target: self,
@@ -94,18 +102,9 @@ class ViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
-    @objc private func onButtonTap(sender: UIButton) {
-        if textView.errorText != nil {
-            textView.errorText = nil
-        } else {
-            textView.errorText = "Some generic error to test things out!"
-        }
-    }
-    
     @objc func dismissKeyboard() {
         view.endEditing(true)
     }
-    
     
     // Shamelessly stolen from https://gist.github.com/nekonora/21fd87b1d4192b5d102200199206baee
     @objc func keyboardWillShow(notification: NSNotification) {
@@ -172,12 +171,21 @@ class ViewController: UIViewController {
     }
 }
 
-extension UIViewController: ValidatingTextViewDelegate {
-    public func validatingTextViewDidEndEditing(_ textView: ValidatingTextView) {
-        debugPrint("Editing stopped and text view reads: \(textView.text)")
+extension UIViewController: PagoTextViewDelegate {
+    public func characterCountText(for characterCount: UInt,
+                                   in textView: PagoTextView) -> String {
+        return "\(characterCount) / \(textView.characterCountLimit) characters"
     }
     
-    public func validatingTextViewDidChange(_ textView: ValidatingTextView) {
-        debugPrint("Text view did change to: \(textView.text)")
+    public func errorText(in textView: PagoTextView) -> String? {
+        // TODO: Here's that awkward textView.textView syntax again
+        if textView.textView.text.lowercased().contains("error") {
+            return """
+            You've successfully mocked an invalid state.
+            Here's a particularly long error text to test things out.
+            """
+        } else {
+            return nil
+        }
     }
 }

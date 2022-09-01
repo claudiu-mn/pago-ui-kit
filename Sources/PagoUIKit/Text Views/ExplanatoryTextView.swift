@@ -8,9 +8,8 @@
 import UIKit
 
 // TODO: Consider making it IBDesignable
-// TODO: Consider working with attributable text as well
 /// A UITextView subclass that can display a placeholder
-class ExplanatoryTextView: UITextView {
+public class ExplanatoryTextView: UITextView {
     // MARK: - Initialization
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
@@ -30,11 +29,11 @@ class ExplanatoryTextView: UITextView {
         label.isUserInteractionEnabled = false
         label.translatesAutoresizingMaskIntoConstraints = false
         addSubview(label)
-
+        
         let top = label.topAnchor.constraint(equalTo: frameLayoutGuide.topAnchor)
         top.isActive = true
         placeholderTop = top
-
+        
         let leading = label.leadingAnchor.constraint(equalTo: frameLayoutGuide.leadingAnchor)
         leading.isActive = true
         placeholderLeading = leading
@@ -44,9 +43,11 @@ class ExplanatoryTextView: UITextView {
         placeholderTrailing = trailing
         
         label.numberOfLines = 0
-
-        label.textColor = UIColor.secondaryLabel
+        
+        label.textColor = UIColor.placeholderText
         label.textAlignment = textAlignment
+        
+        label.text = "Write something here…"
         
         placeholderLabel = label
         
@@ -75,7 +76,7 @@ class ExplanatoryTextView: UITextView {
     // MARK: - Placeholder
     
     private weak var placeholderLabel: UILabel!
-
+    
     private weak var placeholderTop: NSLayoutConstraint!
     private weak var placeholderLeading: NSLayoutConstraint!
     private weak var placeholderTrailing: NSLayoutConstraint!
@@ -91,7 +92,8 @@ class ExplanatoryTextView: UITextView {
     }
     
     private func updatePlaceholderVisibility() {
-        placeholderLabel.alpha = text.isEmpty ? 1 : 0
+        let isEmpty = text.isEmpty && attributedText.length == 0
+        placeholderLabel.alpha = isEmpty ? 1 : 0
     }
     
     // TODO: Does RTL change anything?
@@ -116,6 +118,9 @@ class ExplanatoryTextView: UITextView {
         set {
             super.text = newValue
             updatePlaceholderVisibility()
+            // TODO: This must be documented somewhere
+            NotificationCenter.default.post(name: UITextView.textDidChangeNotification,
+                                            object: self)
         }
     }
     

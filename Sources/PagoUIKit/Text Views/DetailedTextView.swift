@@ -124,11 +124,11 @@ class DetailedTextView : UIView {
         stackView.axis = NSLayoutConstraint.Axis.vertical
         stackView.spacing = 5
         addSubview(stackView)
-        stackView.stick(toTop: 0,
-                        toLeading: 0,
-                        toBottom: 0,
-                        toTrailing: 0,
-                        of: self)
+        stackView.stick(to: self,
+                        atTop: 0,
+                        atLeading: 0,
+                        atBottom: 0,
+                        atTrailing: 0)
         
         let textView = ExplanatoryTextView()
         textView.delegate = self
