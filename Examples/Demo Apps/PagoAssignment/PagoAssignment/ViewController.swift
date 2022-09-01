@@ -37,20 +37,20 @@ class ViewController: UIViewController {
         let textView = ValidatingTextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         stackView.addArrangedSubview(textView)
-        
+
         textView.text = "Why so blue, crew?"
         textView.textColor = UIColor.systemBlue
-        
+
         textView.placeholder = "Write something in this blue text view…"
         textView.placeholderColor = UIColor.systemCyan
-        
+
         textView.characterCountPrefix = "You have "
         textView.characterCountLimitHint = 20
         textView.characterCountSuffix = " characters."
-        
+
         textView.primaryFont = UIFont.systemFont(ofSize: 25)
         textView.secondaryFont = UIFont.systemFont(ofSize: 15)
-        
+
         textView.setDynamicColor(UIColor.systemOrange, for: .invalid)
         textView.setDynamicColor(UIColor.systemTeal, for: .valid)
         textView.characterCountColor = UIColor.systemMint

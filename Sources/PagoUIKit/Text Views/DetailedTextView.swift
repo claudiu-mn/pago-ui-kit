@@ -169,7 +169,7 @@ class DetailedTextView : UIView {
     }
 }
 
-extension DetailedTextView : ExplanatoryTextViewDelegate {
+extension DetailedTextView : UITextViewDelegate {
     func explanatoryTextViewDidChange(_ textView: ExplanatoryTextView) {
         delegate?.detailedTextViewDidChange?(self)
     }
