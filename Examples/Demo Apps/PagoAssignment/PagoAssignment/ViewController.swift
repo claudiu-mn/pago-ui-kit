@@ -70,15 +70,15 @@ class ViewController: UIViewController {
         textView.characterCountColor = UIColor.systemMint
         textView.characterCountLimit = characterCountLimit
         
-        let button = UIButton(type: UIButton.ButtonType.system)
+        let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Useless button", for: UIControl.State.normal)
-        button.backgroundColor = UIColor(rgb: 0xEFF2F7)
+        button.setTitle("Useless button", for: .normal)
+        button.backgroundColor = UIColor.systemGray5
         button.layer.cornerRadius = 10
         stackView.addArrangedSubview(button)
         
         let tap = UITapGestureRecognizer(target: self,
-                                         action: #selector(ViewController.dismissKeyboard))
+                                         action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
     }
     
@@ -177,15 +177,15 @@ extension UIViewController: PagoTextViewDelegate {
         return "\(characterCount) / \(textView.characterCountLimit) characters"
     }
     
-    public func errorText(in textView: PagoTextView) -> String? {
+    public func errorText(in textView: PagoTextView) -> String {
         // TODO: Here's that awkward textView.textView syntax again
         if textView.textView.text.lowercased().contains("error") {
             return """
             You've successfully mocked an invalid state.
             Here's a particularly long error text to test things out.
             """
-        } else {
-            return nil
         }
+        
+        return ""
     }
 }

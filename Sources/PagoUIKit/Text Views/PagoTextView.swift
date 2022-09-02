@@ -8,13 +8,19 @@
 import UIKit
 
 @objc public protocol PagoTextViewDelegate {
-    @objc optional func errorText(in textView: PagoTextView) -> String?
+    /// Returning an empty string will hide the error label and reset the border color to the valid state
+    @objc optional func errorText(in textView: PagoTextView) -> String
     
     /// Returning an empty string will make the text view display the default character count.
     @objc optional func characterCountText(for characterCount: UInt,
                                            in textView: PagoTextView) -> String
 }
 
+private extension PagoTextView {
+    private static let animationDuration: CGFloat = 0.25
+}
+
+// TODO: Intrinsic content size?
 public class PagoTextView: UIView {
     public weak var delegate: PagoTextViewDelegate? {
         didSet {
@@ -71,6 +77,8 @@ public class PagoTextView: UIView {
         stackView.addArrangedSubview(errorLabel)
         self.errorLabel = errorLabel
         
+        errorLabel.contentMode = .bottom
+        errorLabel.layer.masksToBounds = true
         errorLabel.numberOfLines = 0
         errorLabel.textAlignment = .unnatural
         errorTextColor = UIColor.systemRed
@@ -160,7 +168,21 @@ public class PagoTextView: UIView {
             }
         }
         
+        // TODO: Make sure it doesn't animate on init
+        
+        let key = "borderColor"
+        
+        let animation = CABasicAnimation(keyPath: key)
+        animation.fromValue = textView.layer.presentation()?.borderColor
+        animation.toValue = color.cgColor
+        animation.duration = PagoTextView.animationDuration
+        textView.layer.add(animation, forKey: key)
         textView.layer.borderColor = color.cgColor
+    }
+    
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateBorder()
     }
     
     // MARK: - Error label
@@ -178,12 +200,27 @@ public class PagoTextView: UIView {
     }
     
     private func updateErrorLabel() {
-        let errorText = self.delegate?.errorText?(in: self)
-        self.updateErrorLabel(with: errorText)
+        let errorText = delegate?.errorText?(in: self)
+        updateErrorLabel(with: errorText)
     }
     
     private func updateErrorLabel(with errorText: String?) {
-        errorLabel.text = errorText
+        if (errorLabel.text ?? "") == (errorText ?? "") { return }
+        
+        if (errorText ?? "") == "" {
+            let transitionType = CATransitionType.fade
+            let transition = CATransition()
+            transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            transition.type = transitionType
+            transition.duration = PagoTextView.animationDuration
+            errorLabel.layer.add(transition, forKey: transitionType.rawValue)
+        }
+        
+        UIView.animate(withDuration: PagoTextView.animationDuration) { [weak self] in
+            guard let self = self else { return }
+            self.errorLabel.text = errorText
+            self.subviews.first!.layoutIfNeeded()
+        }
     }
     
     // MARK: - Character count
@@ -213,8 +250,8 @@ public class PagoTextView: UIView {
     
     private func updateCharacterCount() {
         let count = UInt(textView.text.count)
-        let countString = self.delegate?.characterCountText?(for: count, in: self)
-        self.updateCharacterCountLabel(with: countString)
+        let countString = delegate?.characterCountText?(for: count, in: self)
+        updateCharacterCountLabel(with: countString)
     }
     
     private func updateCharacterCountLabel(with customString: String?) {
