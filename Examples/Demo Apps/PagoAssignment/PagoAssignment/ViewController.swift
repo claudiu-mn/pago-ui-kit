@@ -107,7 +107,7 @@ class ViewController: UIViewController {
     }
     
     // Shamelessly stolen from https://gist.github.com/nekonora/21fd87b1d4192b5d102200199206baee
-    @objc func keyboardWillShow(notification: NSNotification) {
+    @objc private func keyboardWillShow(notification: NSNotification) {
         let keyboardAnimationDetail = notification.userInfo
         
         let animationCurve: Int = {
@@ -142,7 +142,7 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func keyboardWillHide(notification: NSNotification) {
+    @objc private func keyboardWillHide(notification: NSNotification) {
         let keyboardAnimationDetail = notification.userInfo
         
         let animationCurve: Int = {
@@ -171,7 +171,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension UIViewController: PagoTextViewDelegate {
+extension ViewController: PagoTextViewDelegate {
     public func characterCountText(for characterCount: UInt,
                                    in textView: PagoTextView) -> String {
         return "\(characterCount) / \(textView.characterCountLimit) characters"
