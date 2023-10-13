@@ -67,6 +67,7 @@ public class PagoTextView: UIView {
                                                    bottom: 20,
                                                    right: 15)
         
+        // TODO: Consider removing the observer at some point
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(textViewDidChange(_:)),
                                                name: UITextView.textDidChangeNotification,
@@ -97,12 +98,6 @@ public class PagoTextView: UIView {
         updateCharacterCount()
         
         updateBorder() // TODO: If moved above erorr label init, will crash
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self,
-                                                  name: UITextView.textDidChangeNotification,
-                                                  object: textView)
     }
     
     public private(set) weak var textView: ExplanatoryTextView!
